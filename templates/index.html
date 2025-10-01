@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio de Khadija El Merahy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-padding-top: 80px; /* Pour les liens d'ancrage */
+            padding-top: 0; /* Retirer si présent */
+        }
+        .navbar {
+            transition: all 0.3s ease;
+        }
+        .navbar.scrolled {
+            background-color: rgba(255, 210, 248, 0.9);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .projet-card, .certificat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .projet-card:hover, .certificat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .btn {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .profile-img {
+            border: 4px solid #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .chatbot-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+            border: none;
+        }
+        .chatbot-float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001; /* Doit être supérieur au z-index du bouton flottant */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0; /* Padding déplacé à l'intérieur */
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 80vh; /* Hauteur fixe pour la popup */
+        }
+
+        .modal-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .modal-header h2 {
+             margin: 0 0 5px 0;
+             font-size: 1.5em;
+        }
+
+        .modal-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .close {
+            color: white; /* Couleur changée pour le contraste */
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -10px; /* Ajustement pour aligner avec le titre */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #ddd; /* Couleur au survol */
+            text-decoration: none;
+        }
+
+        .modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Empêche le débordement */
+        }
+
+        /* Styles du chatbot intégré - Adaptés de chatbot.html */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Empêche le débordement */
+            background-color: white;
+            border-radius: 0 0 15px 15px; /* Coins arrondis en bas */
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #f8f9fa; /* Couleur de fond similaire */
+        }
+
+        .message {
+            padding: 12px 16px; /* Ajusté pour une taille plus compacte */
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 0.9em; /* Taille de police légèrement réduite */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: linear-gradient(135deg, #e9ecef, #dde0e3);
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 15px; /* Réduit */
+            border-top: 1px solid #eee;
+            background-color: #f8f9fa;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 12px 15px; /* Réduit */
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 14px; /* Réduit */
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-container input:focus {
+            border-color: #007bff;
+        }
+
+        .input-container button {
+            padding: 12px 20px; /* Réduit */
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px; /* Réduit */
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .input-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+        }
+
+        .input-container button:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive pour la popup */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                height: 85vh;
+                margin: 2.5% auto;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
+            }
+
+            .message {
+                max-width: 90%;
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .input-container {
+                padding: 10px;
+            }
+
+            .input-container input {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .input-container button {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+        }
+
+        /* Styles spécifiques pour la section d'accueil */
+        #accueil {
+            position: relative;
+            overflow: hidden;
+            background-color: #1e3a8a; /* Couleur de fond personnalisée */
+            padding-top: 80px; /* Hauteur du header + espace supplémentaire */
+        }
+
+        #accueil .container {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Éléments graphiques d'arrière-plan */
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.7;
+        }
+
+        .bg-blue {
+            background-color: #3b82f6;
+        }
+
+        .bg-purple {
+            background-color: #9333ea;
+        }
+
+        .bg-indigo {
+            background-color: #6366f1;
+        }
+
+        /* Animation de rebond pour l'indicateur de défilement */
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="navbar fixed top-0 w-full bg-slate-800 text-white py-4 z-50">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-2xl font-bold">Portfolio de Khadija</h1>
+            
+            <!-- Menu pour écrans médium et plus grands -->
+            <nav class="space-x-6 hidden md:block">
+                <a href="#accueil" class="hover:text-blue-400 transition-colors">Accueil</a>
+                <a href="#apropos" class="hover:text-blue-400 transition-colors">À propos</a>
+                <a href="#experience" class="hover:text-blue-400 transition-colors">Expérience</a>
+                <a href="#projets" class="hover:text-blue-400 transition-colors">Projets</a>
+                <a href="#certificats" class="hover:text-blue-400 transition-colors">Certificats</a>
+                <a href="#competences" class="hover:text-blue-400 transition-colors">Compétences</a>
+                <a href="#cv" class="hover:text-blue-400 transition-colors">CV</a>
+                <a href="#contact" class="hover:text-blue-400 transition-colors">Contact</a>
+            </nav>
+            
+            <!-- Bouton menu hamburger pour mobile -->
+            <button id="menuToggle" class="md:hidden text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Menu mobile -->
+        <div id="mobileMenu" class="hidden bg-slate-800 w-full md:hidden">
+            <div class="container mx-auto px-4 py-2">
+                <nav class="flex flex-col space-y-3 pb-4">
+                    <a href="#accueil" class="hover:text-blue-400 transition-colors">Accueil</a>
+                    <a href="#apropos" class="hover:text-blue-400 transition-colors">À propos</a>
+                    <a href="#experience" class="hover:text-blue-400 transition-colors">Expérience</a>
+                    <a href="#projets" class="hover:text-blue-400 transition-colors">Projets</a>
+                    <a href="#certificats" class="hover:text-blue-400 transition-colors">Certificats</a>
+                    <a href="#competences" class="hover:text-blue-400 transition-colors">Compétences</a>
+                    <a href="#cv" class="hover:text-blue-400 transition-colors">CV</a>
+                    <a href="#contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section id="accueil" class="min-h-screen relative overflow-hidden bg-slate-900">
+        <!-- Éléments graphiques d'arrière-plan -->
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-blue-500 rounded-full filter blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-40 h-40 bg-purple-600 rounded-full filter blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 w-48 h-48 bg-indigo-500 rounded-full filter blur-3xl"></div>
+            
+            <!-- Éléments data/code -->
+            <div class="absolute top-0 left-0 right-0 opacity-10 overflow-hidden text-sm">
+                <pre class="text-blue-300 hidden md:block">
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+                </pre>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="container mx-auto px-4 h-full flex flex-col md:flex-row items-center justify-center relative z-10">
+            <!-- Texte de présentation -->
+            <div class="text-white max-w-2xl" data-aos="fade-right" data-aos-duration="1000">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                    <span class="block">Khadija El Merahy</span>
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-light mb-6 text-blue-200">Data Science & IA</h2>
+                
+                <p class="text-xl mb-8 text-gray-300">
+                    Ingénieure en systèmes d'information et Big Data, je transforme les données en insights stratégiques et développe des solutions d'IA adaptées aux défis d'aujourd'hui.
+                </p>
+                
+                <div class="flex flex-wrap gap-4">
+                    <a href="#projets" class="btn bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-all transform hover:-translate-y-1">
+                        <i class="fas fa-project-diagram mr-2"></i> Découvrir mes projets
+                    </a>
+                    <a href="#contact" class="btn bg-transparent border-2 border-blue-400 text-blue-400 px-6 py-3 rounded-full font-semibold hover:bg-blue-400 hover:text-white transition-all">
+                        <i class="fas fa-paper-plane mr-2"></i> Me contacter
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Illustration/Animation côté droit (visible uniquement sur desktop) -->
+            <div class="hidden md:block md:w-1/3 lg:w-2/5" data-aos="fade-left" data-aos-duration="1200">
+                <div class="relative">
+                    <!-- Cercles dynamiques -->
+                    <div class="absolute w-48 h-48 bg-blue-500 rounded-full filter blur-xl opacity-20 animate-pulse"></div>
+                    <div class="absolute w-32 h-32 bg-purple-500 rounded-full top-20 left-20 filter blur-xl opacity-20 animate-pulse" style="animation-delay: 1s;"></div>
+                    
+                    <!-- Image ou icône centrale -->
+                    <div class="relative z-10 text-center">
+                        <i class="fas fa-brain text-9xl text-blue-300 opacity-80"></i>
+                        <div class="mt-6 text-white font-light text-xl">Intelligence Artificielle</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Indicateur de défilement -->
+        <div class="absolute bottom-10 left-0 right-0 text-center animate-bounce">
+            <a href="#apropos" class="text-white opacity-80 hover:opacity-100">
+                <i class="fas fa-chevron-down text-xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <section id="apropos" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">À propos de moi</h2>
+            <div class="flex flex-col md:flex-row items-center gap-8" data-aos="fade-up" data-aos-delay="100">
+                <img src="img/mon_img.jpg" alt="Photo de profil" class="w-48 h-48 rounded-full profile-img" onerror="this.src='https://via.placeholder.com/200x200?text=Photo'">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Qui suis-je ?</h3>
+                    <p class="text-gray-600 mb-4">
+                        Je suis Khadija El Merahy, étudiante en deuxième année du cycle d'ingénierie en Systèmes d'Information et Big Data à l'École Nationale des Sciences Appliquées de Berrechid, Maroc.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        Curieuse, motivée et passionnée par l'analyse de données, le machine learning et la visualisation. Je cherche à appliquer mes compétences et à approfondir mes connaissances à travers un stage en Data Science.
+                    </p>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-16 bg-gray-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">Expérience Professionnelle</h2>
+            <div class="max-w-3xl mx-auto">
+                <!-- Stage d'initiation -->
+                <div class="border-l-4 border-blue-500 pl-6 pb-8 mb-8" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex flex-wrap justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold">Stage d'initiation</h3>
+                        <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">Juillet 2025</span>
+                    </div>
+                    <p class="text-gray-600 font-medium mb-3">Résidences Dar Saada, Casablanca</p>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>Conception et développement de <strong>RDS DataX</strong>, un système agentique d'analyse intelligente des données permettant :
+                            <ul class="list-circle pl-5 mt-1">
+                                <li>L'extraction et la transformation des données depuis une base MySQL.</li>
+                                <li>L’analyse, le nettoyage et la préparation de datasets.</li>
+                                <li>L’interaction en langage naturel pour répondre aux requêtes utilisateurs.</li>
+                                <li>La génération de visualisations interactives.</li>
+                            </ul>
+                        </li>
+                        <li>Utilisation de RDS DataX pour nettoyer et préparer des données en vue de la visualisation d’un rapport dynamique sous Power BI.</li>
+                        <li>Renforcement des compétences en data engineering, data science, visualisation BI, et intégration d’agents IA.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projets" class="py-16 bg-gray-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">Mes Projets (Académiques/Personnels) </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <div class="projet-card bg-gray-50 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                    <img src="img/graph4.png" alt="Analyse de réseau" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x250?text=Analyse+Réseau';">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">Analyse et optimisation d'un réseau de télécommunications</h3>
+                        <p class="text-gray-600 mb-4">Projet académique réalisé avec Python, Neo4j et Gephi, visant à analyser et optimiser un réseau de télécommunications. Mise en place d'une base de données orientée graphe, détection de communautés à l'aide de l'algorithme Walktrap et élaboration de stratégies de gestion préventive des infrastructures.</p>
+                    </div>
+                </div>
+                <div class="projet-card bg-gray-50 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                    <img src="img/smrtlib.png" alt="SmartLib" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x250?text=SmartLib';">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">SmartLib - Gestion de bibliothèque</h3>
+                        <p class="text-gray-600 mb-4">Projet académique : Développement d'une application Java pour la gestion d'une bibliothèque universitaire, intégrant la gestion des livres, des emprunts, des pénalités et des statistiques. Réalisée avec JavaFX, Hibernate et MySQL, selon une architecture MVC.</p>
+                    </div>
+                </div>
+                <div class="projet-card bg-gray-50 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+                    <img src="img/saphir.png" onerror="this.src='https://via.placeholder.com/400x250?text=Saphir+Jewelry';" alt="Saphir Jewelry" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">Saphir Jewelry - Plateforme e-commerce</h3>
+                        <p class="text-gray-600 mb-4">Projet académique : Développement de la partie frontend d’une plateforme e-commerce pour la vente de bijoux, incluant un catalogue interactif, un panier d’achat et une gestion des favoris. Réalisée avec HTML5, CSS3 et JavaScript vanilla, avec un design responsive et une utilisation de localStorage.</p>
+                        <a href="https://khadijaelmerahy.github.io/saphirjewelery.github.io/" class="btn bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">Voir le projet</a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <section id="certificats" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">Mes Certificats</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="certificat-card bg-gray-50 rounded-lg p-6" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="text-xl font-semibold mb-2">Data Science et Machine Learning</h3>
+                    <p class="text-gray-600 mb-2">Délivré par : Udemy (MasterClass Python)</p>
+                    <p class="text-gray-600 mb-2">Durée : 44,5 heures</p>
+                    <p class="text-gray-600">Description : Maîtrise des bibliothèques Python (NumPy, Pandas, Matplotlib, Seaborn, Scikit-Learn) pour l'analyse de données, la visualisation et la création d'algorithmes de Machine Learning (régression, classification, SVM, arbres de décision, Random Forest).</p>
+                    <a href="https://udemy-certificate.s3.amazonaws.com/pdf/UC-f6f7794b-309f-44cb-8107-fec487aac5f5.pdf" class="btn bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 mt-4 inline-block">Voir le certificat</a>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <section id="competences" class="py-16 bg-gray-200">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">Mes Compétences</h2>
+        
+        <!-- Langages de programmation -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold text-center mb-4" data-aos="fade-up" data-aos-delay="50">Langages de programmation</h3>
+            <ul class="flex flex-wrap justify-center gap-4">
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="100">Python</li>
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="150">Java</li>
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="200">C</li>
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="250">SQL</li>
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="300">HTML</li>
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="350">CSS</li>
+                <li class="bg-blue-600 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="400">JavaScript</li>
+            </ul>
+        </div>
+        
+        <!-- Outils et Bibliothèques -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold text-center mb-4" data-aos="fade-up" data-aos-delay="450">Outils et Bibliothèques</h3>
+            <ul class="flex flex-wrap justify-center gap-4">
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="500">NumPy</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="550">Pandas</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="600">Matplotlib</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="650">Seaborn</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="700">Scikit-learn</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="750">PyTorch (bases)</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="800">Neo4j</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="850">Gephi</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="900">JavaFX</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="950">Hibernate</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1000">MySQL</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1050">FastAPI</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1100">Power BI</li>
+                <li class="bg-indigo-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1150">Agno (agents IA)</li>
+            </ul>
+        </div>
+        
+        <!-- Compétences spécifiques -->
+        <div>
+            <h3 class="text-xl font-semibold text-center mb-4" data-aos="fade-up" data-aos-delay="1200">Compétences spécifiques</h3>
+            <ul class="flex flex-wrap justify-center gap-4">
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1250">Nettoyage et préparation de données</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1300">Gestion de bases de données</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1350">Modélisation de systèmes d'information</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1400">Développement d'API REST</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1450">Automatisation de flux de données</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1500">Visualisation BI interactive</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1550">Intégration d'agents intelligents (LLMs GPT-4.1)</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1600">Analyse et reporting de données</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1650">Modélisation prédictive</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1700">Régression et classification supervisées</li>
+                <li class="bg-purple-500 text-white px-4 py-2 rounded-full" data-aos="zoom-in" data-aos-delay="1750">Traitement des données pour machine learning</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<section id="cv" class="py-16 bg-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-8" data-aos="fade-up">Mon CV</h2>
+        <p class="text-gray-600 mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            Découvrez mon parcours, mes compétences et mes réalisations en détail dans mon CV.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+            <!-- Bouton pour télécharger le CV -->
+            <a href="assets/cv khadija el merahy.pdf" download="CV_Khadija_El_Merahy.pdf" class="btn bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 flex items-center">
+                <i class="fas fa-download mr-2"></i> Télécharger le CV
+            </a>
+            <!-- Bouton pour explorer le CV (ouverture dans un nouvel onglet) -->
+            <a href="assets/cv khadija el merahy.pdf" target="_blank" class="btn bg-gray-600 text-white px-6 py-3 rounded-full hover:bg-gray-700 flex items-center">
+                <i class="fas fa-file-pdf mr-2"></i> Explorer le CV
+            </a>
+        </div>
+    </div>
+</section>
+  <section id="contact" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">Contactez-moi</h2>
+        <div class="max-w-lg mx-auto" data-aos="fade-up" data-aos-delay="100">
+            <!-- Formulaire connecté à Formspree -->
+            <form action="https://formspree.io/f/xovkebng" method="POST" class="space-y-4" id="contact-form">
+                <input type="text" name="nom" placeholder="Votre nom" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="email" name="email" placeholder="Votre email" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <textarea name="message" placeholder="Votre message" rows="5" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <button type="submit" class="btn w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600">Envoyer</button>
+            </form>
+            <div id="form-success" class="mt-4 p-3 bg-green-100 text-green-700 rounded-lg hidden">
+                Message envoyé avec succès ! Merci de m'avoir contacté.
+            </div>
+            <div class="mt-8 text-center text-gray-600">
+                <p class="flex items-center justify-center"><i class="fas fa-map-marker-alt mr-2"></i> Casablanca, Maroc</p>
+                <p class="flex items-center justify-center mt-2"><i class="fas fa-envelope mr-2"></i> elmerahykhadija700@gmail.com</p>
+                <p class="flex items-center justify-center mt-2"><i class="fas fa-phone mr-2"></i> +212 656-442062</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <footer class="bg-slate-800 text-white py-6">
+        <div class="container mx-auto text-center">
+            <p>© 2025 Khadija El Merahy. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Bouton flottant modifié pour ouvrir la popup -->
+    <a href="#" class="chatbot-float-btn" onclick="openChatbotModal(event)">
+        <i class="fas fa-comment"></i>
+    </a>
+
+    <!-- Chatbot Modal -->
+    <div id="chatbotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeChatbotModal()">&times;</span>
+                <h2>DijaBot</h2>
+                <p>Assistant virtuel de Khadija El Merahy</p>
+            </div>
+            <div class="modal-body">
+                <div class="chat-container">
+                    <div id="chatHistory" class="chat-history">
+                        <!-- Messages will appear here -->
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="userInput" placeholder="Posez votre question ici...">
+                        <button onclick="sendMessage()">Envoyer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Empêcher la soumission standard du formulaire
+    
+            // Récupérer les données du formulaire
+            const form = this;
+            const formData = new FormData(form);
+            const formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+            
+            // Afficher un indicateur de chargement
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = "Envoi en cours...";
+            submitButton.disabled = true;
+            
+            // Envoyer les données à Formspree via Fetch API
+            fetch('https://formspree.io/f/xovkebng', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formDataObject)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Réinitialiser le formulaire
+                form.reset();
+                
+                // Afficher le message de succès
+                document.getElementById('form-success').classList.remove('hidden');
+                
+                // Restaurer le bouton
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+                
+                // Masquer le message après 5 secondes
+                setTimeout(function() {
+                    document.getElementById('form-success').classList.add('hidden');
+                }, 5000);
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                // Afficher un message d'erreur
+                const formSuccess = document.getElementById('form-success');
+                formSuccess.textContent = "Une erreur s'est produite. Veuillez réessayer.";
+                formSuccess.classList.remove('hidden');
+                formSuccess.classList.remove('bg-green-100', 'text-green-700');
+                formSuccess.classList.add('bg-red-100', 'text-red-700');
+                
+                // Restaurer le bouton
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+                
+                // Masquer le message d'erreur après 5 secondes
+                setTimeout(function() {
+                    formSuccess.classList.add('hidden');
+                    formSuccess.classList.remove('bg-red-100', 'text-red-700');
+                    formSuccess.classList.add('bg-green-100', 'text-green-700');
+                    formSuccess.textContent = "Message envoyé avec succès ! Merci de m'avoir contacté.";
+                }, 5000);
+            });
+        });
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // --- Fonctions pour le Chatbot Modal ---
+
+        function openChatbotModal(event) {
+            event.preventDefault();
+            document.getElementById('chatbotModal').style.display = 'block';
+            
+            // Afficher un message d'accueil si l'historique est vide
+            if (document.getElementById('chatHistory').children.length === 0) {
+                addMessage("Bonjour ! Je suis DijaBot, l'assistant virtuel de Khadija. Comment puis-je vous aider ?", 'bot');
+            }
+            
+            setTimeout(() => {
+                document.getElementById('userInput').focus();
+            }, 100);
+        }
+
+        function closeChatbotModal() {
+            document.getElementById('chatbotModal').style.display = 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            addMessage(question, 'user');
+            input.value = '';
+
+            // Afficher un indicateur de chargement
+            const loadingId = addMessage("...", 'bot-loading');
+
+            fetch('/ask', {  // Changé de 'http://localhost:8000/chat' à '/ask'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    question: question
+                    // conversation_id supprimé car non supporté par le backend
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Supprimer l'indicateur de chargement
+                removeMessage(loadingId);
+                
+                // Ajouter la réponse du bot
+                addMessage(data.answer, 'bot');
+                // conversation_id n'est plus utilisé
+            })
+            .catch(error => {
+                // Supprimer l'indicateur de chargement
+                removeMessage(loadingId);
+                
+                addMessage("Désolé, une erreur s'est produite. Veuillez réessayer.", 'bot');
+                console.error('Erreur:', error);
+            });
+        }
+
+        function addMessage(text, sender) {
+            const chatHistory = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            const messageId = 'msg-' + Date.now();
+            
+            messageDiv.id = messageId;
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            return messageId;
+        }
+
+        function removeMessage(messageId) {
+            const messageElement = document.getElementById(messageId);
+            if (messageElement) {
+                messageElement.remove();
+            }
+        }
+
+        // Fermer la popup si l'utilisateur clique en dehors de celle-ci
+        window.onclick = function(event) {
+            const modal = document.getElementById('chatbotModal');
+            if (event.target == modal) {
+                closeChatbotModal();
+            }
+        }
+
+        // Gérer la touche Entrée dans le champ de saisie
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Fonctions pour le menu mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Fermer le menu mobile quand on clique sur un lien
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('mobileMenu').classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
