@@ -116,11 +116,3 @@ async def download_file(filename: str):
     else:
         return {"error": "File not found"}
 
-# --- 11. Run the server properly ---
-if __name__ == "__main__":
-    import sys
-    import subprocess
-    
-    print("🚀 Starting CV Assistant server at http://127.0.0.1:8000")
-    # CORRECTION: Utiliser le bon nom de module
-    subprocess.run([sys.executable, "-m", "uvicorn", "chatbot:app", "--reload", "--host", "127.0.0.1", "--port", "8000"])
