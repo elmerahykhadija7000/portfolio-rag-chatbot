@@ -1,22 +1,10 @@
-fastapi
-uvicorn
-jinja2
-python-dotenv
-python-multipart  # Add this line for form handling
-
-# LangChain core + integrations
-langchain
-langchain-google-genai
-langchain-huggingface
-langchain-community
-
-# Vector store
-chromadb
-
-# Embeddings HuggingFace
-sentence-transformers
-transformers
-torch
-
-# Utils
-pydantic
+fastapi==0.111.0
+uvicorn[standard]==0.23.2
+python-dotenv==1.0.1
+jinja2==3.2.0
+langchain==0.1.0
+langchain-huggingface==0.0.5
+langchain-google-genai==0.0.3
+langchain-community==0.0.8
+chromadb==0.3.30
+sentence-transformers==2.2.2
