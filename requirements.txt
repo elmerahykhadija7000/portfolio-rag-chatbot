@@ -1,11 +1,12 @@
 fastapi
 uvicorn
 python-dotenv
-jinja2
-langchain
-langchain-huggingface
 langchain-google-genai
+langchain-huggingface
 langchain-community
-chromadb
+langchain
+pydantic
+python-multipart
+jinja2
 sentence-transformers
-
+chromadb
